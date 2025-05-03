@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ping Monitor</title>
+    <style>
+        :root {
+            --primary-color: #2196F3;
+            --success-color: #4CAF50;
+            --danger-color: #f44336;
+            --warning-color: #FF9800;
+            --dark-color: #333;
+            --light-color: #f5f5f5;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .button-group {
+            margin: 30px 0;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #startBtn {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        #stopBtn {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        #exportBtn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        #settingsBtn {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .metrics {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 15px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .metric-item h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .metric-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .status.running {
+            background-color: #e8f5e9;
+            color: var(--success-color);
+        }
+
+        .status.stopped {
+            background-color: #ffebee;
+            color: var(--danger-color);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .metrics {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ping Monitor</h1>
+        
+        <div class="form-group">
+            <label for="target">Target (URL/IP):</label>
+            <input type="text" id="target" placeholder="e.g., google.com or 8.8.8.8">
+        </div>
+        
+        <div class="form-group">
+            <label for="company">Company/Client Name:</label>
+            <input type="text" id="company" placeholder="Enter company name">
+        </div>
+        
+        <div class="form-group">
+            <label for="duration">Test Duration (hours):</label>
+            <input type="number" id="duration" placeholder="Leave empty for continuous test">
+        </div>
+        
+        <div class="button-group">
+            <button id="startBtn">Start Test</button>
+            <button id="stopBtn" disabled>Stop Test</button>
+            <button id="exportBtn" disabled>Export Results</button>
+            <button id="settingsBtn">Configurações</button>
+        </div>
+        
+        <div class="metrics">
+            <div class="metric-item">
+                <h3>Min Ping</h3>
+                <div class="metric-value" id="minPing">-</div>
+            </div>
+            <div class="metric-item">
+                <h3>Max Ping</h3>
+                <div class="metric-value" id="maxPing">-</div>
+            </div>
+            <div class="metric-item">
+                <h3>Average Ping</h3>
+                <div class="metric-value" id="avgPing">-</div>
+            </div>
+            <div class="metric-item">
+                <h3>Success Rate</h3>
+                <div class="metric-value" id="successRate">-</div>
+            </div>
+        </div>
+        
+        <div class="status" id="status">
+            Status: Not running
+        </div>
+    </div>
+    
+    <script src="renderer.js"></script>
+</body>
+</html> 
