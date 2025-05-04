@@ -7,6 +7,9 @@ const config = require('./config.json');
 let pingInterval = null;
 let pingResults = [];
 let logFile = null;
+let testStartTime = null;
+let testEndTime = null;
+let currentCompany = null;
 
 async function ensureLogDirectory() {
   await fs.ensureDir(config.logDirectory);
@@ -45,6 +48,8 @@ async function startTest(target, company, durationHours) {
   
   const timestamp = moment().format('YYYYMMDD_HHmmss');
   logFile = `${config.logDirectory}/${timestamp}_${company}_ping.txt`;
+  currentCompany = company;
+  testStartTime = new Date().toISOString();
   
   pingResults = [];
   
@@ -52,7 +57,7 @@ async function startTest(target, company, durationHours) {
   const startTime = Date.now();
   
   // Adiciona um log inicial com informações do teste
-  const initialLog = `Starting ping test at ${new Date().toISOString()}\nTarget: ${target}\nCompany: ${company}\nDuration: ${durationHours || 'Continuous'}\n\n`;
+  const initialLog = `Starting ping test at ${testStartTime}\nTarget: ${target}\nCompany: ${company}\nDuration: ${durationHours || 'Continuous'}\n\n`;
   fs.appendFileSync(logFile, initialLog);
   
   pingInterval = setInterval(async () => {
@@ -112,9 +117,10 @@ async function stopTest() {
   
   clearInterval(pingInterval);
   pingInterval = null;
+  testEndTime = new Date().toISOString();
   
   const metrics = calculateMetrics();
-  const finalLog = `\nTest completed at ${new Date().toISOString()}\nMetrics:\n${JSON.stringify(metrics, null, 2)}\n`;
+  const finalLog = `\nTest completed at ${testEndTime}\nMetrics:\n${JSON.stringify(metrics, null, 2)}\n`;
   fs.appendFileSync(logFile, finalLog);
   
   try {
@@ -123,6 +129,9 @@ async function stopTest() {
     const logBase64 = Buffer.from(logContent).toString('base64');
     
     await axios.post(config.apiEndpoint, {
+      company: currentCompany,
+      startTime: testStartTime,
+      endTime: testEndTime,
       metrics,
       logFile: logBase64,
       fileName: logFile.split('/').pop(),
