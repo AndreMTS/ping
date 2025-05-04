@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const durationInput = document.getElementById('duration');
     const startBtn = document.getElementById('startBtn');
     const stopBtn = document.getElementById('stopBtn');
-    const exportBtn = document.getElementById('exportBtn');
+    // const exportBtn = document.getElementById('exportBtn');
     const settingsBtn = document.getElementById('settingsBtn');
     const statusDiv = document.getElementById('status');
     const minPingSpan = document.getElementById('minPing');
@@ -52,18 +52,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    exportBtn.addEventListener('click', async () => {
-        try {
-            const result = await window.electronAPI.exportResults();
-            if (result.status === 'exported') {
-                alert(`Results exported to: ${result.path}`);
-            } else {
-                alert('No results to export');
-            }
-        } catch (error) {
-            alert('Failed to export results: ' + error.message);
-        }
-    });
+    // exportBtn.addEventListener('click', async () => {
+    //     try {
+    //         const result = await window.electronAPI.exportResults();
+    //         if (result.status === 'exported') {
+    //             alert(`Results exported to: ${result.path}`);
+    //         } else {
+    //             alert('No results to export');
+    //         }
+    //     } catch (error) {
+    //         alert('Failed to export results: ' + error.message);
+    //     }
+    // });
 
     settingsBtn.addEventListener('click', () => {
         window.electronAPI.navigateToSettings();
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateUI() {
         startBtn.disabled = isRunning;
         stopBtn.disabled = !isRunning;
-        exportBtn.disabled = !isRunning;
+        // exportBtn.disabled = !isRunning;
         targetInput.disabled = isRunning;
         companyInput.disabled = isRunning;
         durationInput.disabled = isRunning;
